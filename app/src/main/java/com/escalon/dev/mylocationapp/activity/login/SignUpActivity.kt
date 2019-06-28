@@ -25,7 +25,7 @@ class SignUpActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_up)
 
-        //title = "Registrarse"
+        title = "Registrarse"
 
         val binding = DataBindingUtil.setContentView<ActivitySignUpBinding>(this, R.layout.activity_sign_up)
         signUpViewModel = ViewModelProviders.of(this).get(SignUpViewModel::class.java)

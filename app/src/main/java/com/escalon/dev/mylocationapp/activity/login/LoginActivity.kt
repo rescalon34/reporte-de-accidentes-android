@@ -29,6 +29,8 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        title = "Iniciar Sesión"
+
         val binding = DataBindingUtil.setContentView<ActivityLoginBinding>(this, R.layout.activity_login)
         loginViewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
         binding.loginViewModel = this.loginViewModel
@@ -46,7 +48,6 @@ class LoginActivity : AppCompatActivity() {
             loginViewModel?.loginRequest = LoginRequest(userNameArg, passwordArg)
             performLoginAction()
         }
-
 
         loginViewModel?.getLoginActionEvent()?.observe(this, onLoginActionObserved())
     }
