@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="24dp">
+
+    <TextView
+            android:id="@+id/tv_send_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Envia un mensaje"
+            android:textAlignment="center"
+            android:gravity="top"
+            android:textColor="@color/gray"
+            android:textStyle="bold"
+            android:textSize="18sp"/>
+
+    <EditText
+            android:id="@+id/edt_send_message"
+            android:layout_width="match_parent"
+            android:layout_below="@+id/tv_send_message"
+            android:layout_marginTop="16dp"
+            android:hint="Escribe tu texto aqui!"
+            android:lines="14"
+            style="@style/RoundedEditText"
+            android:layout_height="130dp"/>
+
+    <Button android:id="@+id/btn_send_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/RoundedButton"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="44dp"
+            android:layout_marginEnd="44dp"
+            android:padding="16dp"
+            android:layout_below="@id/edt_send_message"
+            android:text="Enviar"/>
+
+</RelativeLayout>
