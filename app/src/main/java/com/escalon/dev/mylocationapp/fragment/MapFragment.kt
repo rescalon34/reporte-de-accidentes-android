@@ -10,8 +10,10 @@ import android.location.Location
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
+import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
+import android.support.v7.app.AlertDialog
 import android.view.*
 import android.widget.Toast
 import com.escalon.dev.mylocationapp.MyLocationApplication.Companion.preferences
@@ -49,9 +51,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionCa
     private var currentLocationMarker: Marker? = null
     private var currentlocation: String? = null
 
-    var accessTokenRepository : AccessTokenRepository? = null
+    var accessTokenRepository: AccessTokenRepository? = null
 
     companion object {
+        const val PERMISSIONS_REQUEST_LOCATION = 5
+
         fun getInstance() = MapFragment()
     }
 
@@ -74,7 +78,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionCa
         }
 
         accessTokenRepository = AccessTokenRepository(
-            AppLocationDb.getInstance(context).accessTokenDao(), NetworkManager.getNetworkManager())
+            AppLocationDb.getInstance(context).accessTokenDao(), NetworkManager.getNetworkManager()
+        )
     }
 
     private fun hasLocationPermission(): Boolean {
@@ -101,8 +106,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionCa
             googleMap?.isMyLocationEnabled = true
             initGooglePlayServices()
         } else {
-            Toast.makeText(activity, "No permissions yet!", Toast.LENGTH_SHORT).show()
-            // TODO request permission
+            requestPermission()
         }
     }
 
@@ -152,14 +156,67 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleApiClient.ConnectionCa
 
     @SuppressLint("MissingPermission")
     override fun onConnected(p0: Bundle?) {
+
+        if (hasLocationPermission()) {
+            // request location updates
+            LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, getLocationRequest(), this)
+        } else {
+            requestPermission()
+        }
+
+    }
+
+    private fun getLocationRequest(): LocationRequest? {
         locationRequest = LocationRequest()
         locationRequest?.let {
             it.interval = 1000
             it.fastestInterval = 1000
             it.priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
+        }
+        return locationRequest
+    }
 
-            if (hasLocationPermission()) {
-                LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, it, this)
+    private fun requestPermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+            // show a message to alert user that requested permissions are required
+            val alertDialog = AlertDialog.Builder(activity)
+            alertDialog
+                .setTitle("Requesting Permission")
+                .setMessage("App needs to have the following permission to work properly")
+                .setPositiveButton("OK") { _, _ ->
+                    ActivityCompat.requestPermissions(
+                        activity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                        PERMISSIONS_REQUEST_LOCATION
+                    )
+                }.create()
+                .show()
+        } else {
+            Toast.makeText(activity, "permissions are required for app to work properly!", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        when (requestCode) {
+            PERMISSIONS_REQUEST_LOCATION -> {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission granted
+                    if (ContextCompat.checkSelfPermission(
+                            activity,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                        ) == PackageManager.PERMISSION_GRANTED
+                    ) {
+
+                        // init google play services
+                        googleMap?.isMyLocationEnabled = true
+                        initGooglePlayServices()
+                    }
+                } else {
+                    // permission denied
+                    Toast.makeText(activity, "permissions are denied!, app won't work properly", Toast.LENGTH_SHORT)
+                        .show()
+                }
             }
         }
     }

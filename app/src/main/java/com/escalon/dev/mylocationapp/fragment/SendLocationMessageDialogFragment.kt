@@ -1,5 +1,6 @@
 package com.escalon.dev.mylocationapp.fragment
 
+import android.app.ProgressDialog
 import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
@@ -25,6 +26,7 @@ class SendLocationMessageDialogFragment : DialogFragment() {
 
     private var currentLocation: String? = null
     private var sendLocationMessageRepository: SendLocationMessageRepository? = null
+    private var progressBar: ProgressDialog? = null
 
     var accessTokenRepository = AccessTokenRepository(
         AppLocationDb.getInstance(MyLocationApplication.instance).accessTokenDao(),
@@ -64,6 +66,11 @@ class SendLocationMessageDialogFragment : DialogFragment() {
         Log.d("CURRENTLOCATION", "current location: $currentLocation")
 
         btn_send_message.setOnClickListener {
+            progressBar = ProgressDialog(activity)
+            progressBar?.setMessage("Cargando...")
+            progressBar?.setCancelable(false)
+            progressBar?.show()
+            progressBar?.isIndeterminate = true
             if (edt_send_message.text.isNotEmpty()) {
                 accessTokenRepository.queryAccessToken().observe(activity, onAccessTokenObserved())
             } else {
@@ -88,10 +95,14 @@ class SendLocationMessageDialogFragment : DialogFragment() {
         when (messageResponse) {
             is ApiSuccessResponse -> {
                 Toast.makeText(activity, "Mensaje enviado exitosamente!", Toast.LENGTH_SHORT).show()
+                progressBar?.isIndeterminate = false
+                progressBar?.dismiss()
                 //close dialog after sending data
                 dismiss()
             }
             is ApiErrorResponse -> {
+                progressBar?.isIndeterminate = false
+                progressBar?.dismiss()
                 Toast.makeText(activity, "Error! intente de nuevo por favor.", Toast.LENGTH_SHORT).show()
             }
         }
