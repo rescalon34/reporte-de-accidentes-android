@@ -29,6 +29,6 @@ interface LocationApi {
     @FormUrlEncoded
     fun sendLocationMessage(
         @Field("location") location: String?,
-        @Field("comment") message: String?
+        @Field("message") message: String?
     ): LiveData<ApiResponse<Any>>
 }

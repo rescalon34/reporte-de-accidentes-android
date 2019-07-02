@@ -52,7 +52,7 @@ class SignUpActivity : AppCompatActivity() {
     private fun onRegisterUserObserved() = Observer<ApiResponse<Any>> { responseSignUp ->
         when (responseSignUp) {
             is ApiSuccessResponse -> {
-                Toast.makeText(this, responseSignUp.body.toString(), Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Registro exitoso!", Toast.LENGTH_SHORT).show()
                 signUpViewModel?.progressBarVisibility?.set(View.GONE)
                 signUpViewModel?.signUpButtonEnabled?.set(true)
 
